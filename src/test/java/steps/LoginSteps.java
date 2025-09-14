@@ -1,14 +1,18 @@
 package steps;
 
+import data.AuthorizationUserModel;
 import data.TestData;
 import data.User;
 import io.qameta.allure.Step;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.openqa.selenium.WebDriver;
 import pages.ForgotPasswordPage;
 import pages.LoginPage;
 import pages.MainPage;
 import pages.RegistrationPage;
 
+import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertTrue;
 
 public class LoginSteps {
@@ -68,5 +72,24 @@ public class LoginSteps {
         driver.findElement(
                 new ForgotPasswordPage(driver)
                         .getLoginButton()).click();
+    }
+
+    @Step("Авторизация с применением существующих данных пользователя")
+    public Response authorizationUserStep(User user) {
+        String PATH_LOGIN_USER = "/api/auth/login";
+
+        AuthorizationUserModel authorizationUserModel = new AuthorizationUserModel(driver)
+                .setEmail(user.getRANDOM_EMAIL())
+                .setPassword(user.getRANDOM_PASSWORD());
+
+        return given()
+                .log().all()
+                .baseUri("https://stellarburgers.nomoreparties.site")
+                .contentType(ContentType.JSON)
+                .body(authorizationUserModel)
+                .when()
+                .post(PATH_LOGIN_USER)
+                .then()
+                .extract().response();
     }
 }

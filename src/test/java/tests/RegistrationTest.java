@@ -3,6 +3,7 @@ package tests;
 import data.TestData;
 import data.User;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import steps.DeleteUserSteps;
 import steps.LoginSteps;
 import steps.RegistrationSteps;
 
@@ -27,6 +29,8 @@ public class RegistrationTest {
     private RegistrationSteps registrationSteps;
     private TestData testData;
     private User user;
+    private Response response;
+
 
     @Parameterized.Parameters
     public static Object[][] getData() {
@@ -70,8 +74,20 @@ public class RegistrationTest {
         registrationSteps.clickButtonRegistrationOnRegistrationPage();
         registrationSteps.checkErrorForWrongPassword();
     }
+
     @After
     public void closeUp() {
+        String accessToken;
+        DeleteUserSteps deleteUserSteps = new DeleteUserSteps();
+        response =
+                loginSteps.authorizationUserStep(user);
+        accessToken =
+                deleteUserSteps.findAccessToken(response);
+        if (accessToken != null) {
+            response =
+                    deleteUserSteps.deleteUser(accessToken);
+            deleteUserSteps.checkDeleteUser(response);
+        }
         driver.quit();
     }
 }

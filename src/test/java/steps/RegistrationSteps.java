@@ -1,17 +1,22 @@
 package steps;
 
+import data.RegistrationUserModel;
 import data.TestData;
 import data.User;
 import io.qameta.allure.Step;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.openqa.selenium.WebDriver;
 import pages.LoginPage;
 import pages.RegistrationPage;
 
+import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class RegistrationSteps {
 
+    private static final String PATH_CREATE_USER = "/api/auth/register";
     WebDriver driver;
     LoginPage loginPage;
     RegistrationPage registrationPage;
@@ -57,5 +62,23 @@ public class RegistrationSteps {
     @Step("Проверка отображения ошибки для некорректного пароля")
     public void checkErrorForWrongPassword() {
         assertTrue("Текст ошибки не отображается", driver.findElement(registrationPage.getIncorrectPassword()).isDisplayed());
+    }
+
+    @Step("Создание нового пользователя")
+    public Response createNewUser(User user) {
+        RegistrationUserModel registrationUserModel = new RegistrationUserModel()
+        .setEmail(user.getRANDOM_EMAIL())
+        .setPassword(user.getRANDOM_PASSWORD())
+        .setName(user.getRANDOM_NAME());
+
+        return given()
+                .log().all()
+                .baseUri("https://stellarburgers.nomoreparties.site")
+                .contentType(ContentType.JSON)
+                .body(registrationUserModel)
+                .when()
+                .post(PATH_CREATE_USER)
+                .then()
+                .extract().response();
     }
 }

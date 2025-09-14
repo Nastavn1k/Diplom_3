@@ -3,6 +3,7 @@ package tests;
 import data.TestData;
 import data.User;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import steps.DeleteUserSteps;
 import steps.LoginSteps;
 import steps.RegistrationSteps;
 
@@ -27,6 +29,7 @@ public class LoginTest {
     TestData testData;
     RegistrationSteps registrationSteps;
     User user;
+    Response response;
 
     @Parameterized.Parameters
     public static Object[][] getData() {
@@ -55,12 +58,8 @@ public class LoginTest {
 
     @Test
     public void loginUsingButtonMainPageTest() {
-        loginSteps.clickButtonLoginInAccount();
-        registrationSteps.clickButtonRegistrationOnLoginPage();
-        registrationSteps.fillingFieldsForRegistration(user);
-        registrationSteps.clickButtonRegistrationOnRegistrationPage();
-        registrationSteps.checkUrlAfterRegister();
-        loginSteps.clickLogoBurger();
+        response =
+                registrationSteps.createNewUser(user);
         loginSteps.clickButtonLoginInAccount();
         loginSteps.fillingFieldsForLogin(user);
         loginSteps.clickButtonLoginOnLoginPage();
@@ -69,12 +68,8 @@ public class LoginTest {
 
     @Test
     public void loginUsingButtonPersonalAccountOnMainPageTest() {
-        loginSteps.clickButtonLoginInAccount();
-        registrationSteps.clickButtonRegistrationOnLoginPage();
-        registrationSteps.fillingFieldsForRegistration(user);
-        registrationSteps.clickButtonRegistrationOnRegistrationPage();
-        registrationSteps.checkUrlAfterRegister();
-        loginSteps.clickLogoBurger();
+        response =
+                registrationSteps.createNewUser(user);
         loginSteps.clickButtonPersonalAccount();
         loginSteps.fillingFieldsForLogin(user);
         loginSteps.clickButtonLoginOnLoginPage();
@@ -83,11 +78,8 @@ public class LoginTest {
 
     @Test
     public void loginUsingButtonOnRegistrationPageTest() {
-        loginSteps.clickButtonLoginInAccount();
-        registrationSteps.clickButtonRegistrationOnLoginPage();
-        registrationSteps.fillingFieldsForRegistration(user);
-        registrationSteps.clickButtonRegistrationOnRegistrationPage();
-        registrationSteps.checkUrlAfterRegister();
+        response =
+                registrationSteps.createNewUser(user);
         testData.openRegisterPage();
         loginSteps.clickButtonLoginOnRegistrationPage();
         loginSteps.fillingFieldsForLogin(user);
@@ -97,11 +89,8 @@ public class LoginTest {
 
     @Test
     public void loginUsingButtonOnForgotPasswordPageTest() {
-        loginSteps.clickButtonLoginInAccount();
-        registrationSteps.clickButtonRegistrationOnLoginPage();
-        registrationSteps.fillingFieldsForRegistration(user);
-        registrationSteps.clickButtonRegistrationOnRegistrationPage();
-        registrationSteps.checkUrlAfterRegister();
+        response =
+                registrationSteps.createNewUser(user);
         testData.openForgotPasswordPage();
         loginSteps.clickButtonLoginOnForgotPasswordPage();
         loginSteps.fillingFieldsForLogin(user);
@@ -111,6 +100,13 @@ public class LoginTest {
 
     @After
     public void closeUp() {
+        DeleteUserSteps deleteUserSteps = new DeleteUserSteps();
+        String accessToken = deleteUserSteps.findAccessToken(response);
+        if (accessToken != null) {
+            response =
+                    deleteUserSteps.deleteUser(accessToken);
+            deleteUserSteps.checkDeleteUser(response);
+        }
         driver.quit();
     }
 }
