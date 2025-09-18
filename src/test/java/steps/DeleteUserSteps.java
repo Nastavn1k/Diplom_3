@@ -1,15 +1,14 @@
 package steps;
 
+import api.UserApi;
 import io.qameta.allure.Step;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 public class DeleteUserSteps {
 
-    public static final String PATH_DELETE_USER = "/api/auth/user";
+    private UserApi userApi = new UserApi();
 
     @Step("Получить токен")
     public String findAccessToken(Response response) {
@@ -19,15 +18,7 @@ public class DeleteUserSteps {
 
     @Step("Удаление пользователя")
     public Response deleteUser(String accessToken) {
-        return given()
-                .log().all()
-                .baseUri("https://stellarburgers.nomoreparties.site")
-                .header("Authorization", accessToken)
-                .contentType(ContentType.JSON)
-                .when()
-                .delete(PATH_DELETE_USER)
-                .then()
-                .extract().response();
+        return userApi.deleteUser(accessToken);
     }
 
     @Step("Проверка успешного удаления пользователя")

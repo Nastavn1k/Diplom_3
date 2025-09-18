@@ -7,8 +7,6 @@ import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -18,11 +16,7 @@ import steps.RegistrationSteps;
 
 import java.time.Duration;
 
-@RunWith(Parameterized.class)
 public class LoginTest {
-
-    @Parameterized.Parameter()
-    public String browser;
 
     WebDriver driver;
     LoginSteps loginSteps;
@@ -31,35 +25,31 @@ public class LoginTest {
     User user;
     Response response;
 
-    @Parameterized.Parameters
-    public static Object[][] getData() {
-        return new Object[][]{
-                {"yandex"},
-                {"chrome"}
-        };
-    }
-
     @Before
     public void setUp() {
+
+        String browser = System.getProperty("browser", "chrome");
+
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
+
         if ("yandex".equals(browser)) {
             System.setProperty("webdriver.chrome.driver", "D:\\Program Files\\yandexdriver.exe");
             options.setBinary("C:\\Users\\user\\AppData\\Local\\Yandex\\YandexBrowser\\Application\\browser.exe");
         }
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        user = new User(driver);
+        user = new User();
         loginSteps = new LoginSteps(driver);
         registrationSteps = new RegistrationSteps(driver);
         testData = new TestData(driver);
         testData.openMainPage();
+        response =
+                registrationSteps.createNewUser(user);
     }
 
     @Test
     public void loginUsingButtonMainPageTest() {
-        response =
-                registrationSteps.createNewUser(user);
         loginSteps.clickButtonLoginInAccount();
         loginSteps.fillingFieldsForLogin(user);
         loginSteps.clickButtonLoginOnLoginPage();
@@ -68,8 +58,6 @@ public class LoginTest {
 
     @Test
     public void loginUsingButtonPersonalAccountOnMainPageTest() {
-        response =
-                registrationSteps.createNewUser(user);
         loginSteps.clickButtonPersonalAccount();
         loginSteps.fillingFieldsForLogin(user);
         loginSteps.clickButtonLoginOnLoginPage();
@@ -78,8 +66,6 @@ public class LoginTest {
 
     @Test
     public void loginUsingButtonOnRegistrationPageTest() {
-        response =
-                registrationSteps.createNewUser(user);
         testData.openRegisterPage();
         loginSteps.clickButtonLoginOnRegistrationPage();
         loginSteps.fillingFieldsForLogin(user);
@@ -89,8 +75,6 @@ public class LoginTest {
 
     @Test
     public void loginUsingButtonOnForgotPasswordPageTest() {
-        response =
-                registrationSteps.createNewUser(user);
         testData.openForgotPasswordPage();
         loginSteps.clickButtonLoginOnForgotPasswordPage();
         loginSteps.fillingFieldsForLogin(user);

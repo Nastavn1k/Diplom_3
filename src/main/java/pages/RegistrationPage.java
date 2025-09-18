@@ -1,5 +1,6 @@
 package pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -18,27 +19,48 @@ public class RegistrationPage {
     private By incorrectPassword = By.xpath("//p[contains(text(), 'Некорректный пароль')]");
     private By loginButton = By.className("Auth_link__1fOlj");
 
-    public By getNameField() {
-        return nameField;
-    }
-
+    @Step("Получить локатор поля Email, на странице регистрации")
     public By getEmailField() {
         return emailField;
     }
 
+    @Step("Получить локатор Пароль, на странице регистрации")
     public By getPasswordField() {
         return passwordField;
     }
 
-    public By getButtonRegistration() {
-        return buttonRegistration;
+    @Step("Ответ типа boolean, отображается ли текст ошибки")
+    public boolean isErrorDisplayed() {
+        return driver.findElement(incorrectPassword).isDisplayed();
     }
 
-    public By getIncorrectPassword() {
-        return incorrectPassword;
-    }
-
+    @Step("Получить локатор кнопки войти, на странице регистрации")
     public By getLoginButton() {
         return loginButton;
+    }
+
+    @Step("Ввести имя для регистрации")
+    public void enterName(String name) {
+        driver.findElement(nameField).sendKeys(name);
+    }
+
+    @Step("Ввести email для регистрации")
+    public void enterEmail(String email) {
+        driver.findElement(emailField).sendKeys(email);
+    }
+
+    @Step("Ввести пароль для регистрации")
+    public void enterPassword(String password) {
+        driver.findElement(passwordField).sendKeys(password);
+    }
+
+    @Step("Нажать кнопку Зарегистрироваться")
+    public void clickRegistrationButton() {
+        driver.findElement(buttonRegistration).click();
+    }
+
+    @Step("Нажать кнопку Войти со страницы регистрации")
+    public void clickLoginButton() {
+        driver.findElement(loginButton).click();
     }
 }

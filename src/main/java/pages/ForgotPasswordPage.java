@@ -1,5 +1,6 @@
 package pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -13,7 +14,8 @@ public class ForgotPasswordPage {
 
     private By loginButton = By.className("Auth_link__1fOlj");
 
-    public By getLoginButton() {
-        return loginButton;
+    @Step("Нажать кнопку Войти со страницы восстановления пароля")
+    public void clickLoginButton() {
+        driver.findElement(loginButton).click();
     }
 }
